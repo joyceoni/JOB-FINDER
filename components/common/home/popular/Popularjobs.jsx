@@ -1,0 +1,57 @@
+import { useState } from "react";
+import { View, Text,ActivityIndicator,FlatList, TouchableOpacity } from "react-native"
+import {useRouter} from 'expo-router'
+import styles from '../popular/popularjobs.style'
+import PopularJobCard from "../../cards/popular/PopularJobCard";
+import { COLORS,SIZES } from "../../../../constants";
+import useFetch from "../../../../hook/useFetch";
+
+const Popularjobs = () => {
+  const router = useRouter();
+ const {data,isLoading,error} = useFetch 
+ ('search', {
+  query: 'React deevloper',
+  num_pages:1,
+ })
+
+ const [selectedJob, setSelectedJob] = useState();
+
+ const handleCardPress = (item) => {
+  router.push(`/job-details/${item.job_id}`);
+  setSelectedJob(item.job_id);
+};
+
+ console.log(data);
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Popular jobs</Text>
+        <TouchableOpacity>
+          <Text style={styles.headerBtn}>Show all</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.cardsContainer}>
+        {isLoading ? (
+          <ActivityIndicator size='large' color={COLORS.primary} />
+        ) : (
+          <FlatList
+            data={data}
+            renderItem={({ item }) => (
+              <PopularJobCard
+                item={item}
+                selectedJob={selectedJob}
+                handleCardPress={handleCardPress}
+              />
+            )}
+            keyExtractor={(item) => item.job_id}
+            contentContainerStyle={{ columnGap: SIZES.medium }}
+            horizontal
+          />
+        )}
+      </View>
+    </View>
+  );
+}
+
+export default Popularjobs; 
